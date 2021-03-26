@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{83C3E877-BAF1-41EA-B6D3-FAADBC92675C}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="frmBallGame_p.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Embarcadero\Studio\Projects\frmWebBrowser_p.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Embarcadero\Studio\Projects\frmNotePad_p.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="frmBallGame_p">
+        <MSBuild Projects="frmBallGame_p.dproj"/>
+    </Target>
+    <Target Name="frmBallGame_p:Clean">
+        <MSBuild Projects="frmBallGame_p.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="frmBallGame_p:Make">
+        <MSBuild Projects="frmBallGame_p.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="frmWebBrowser_p">
+        <MSBuild Projects="..\..\Embarcadero\Studio\Projects\frmWebBrowser_p.dproj"/>
+    </Target>
+    <Target Name="frmWebBrowser_p:Clean">
+        <MSBuild Projects="..\..\Embarcadero\Studio\Projects\frmWebBrowser_p.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="frmWebBrowser_p:Make">
+        <MSBuild Projects="..\..\Embarcadero\Studio\Projects\frmWebBrowser_p.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="frmNotePad_p">
+        <MSBuild Projects="..\..\Embarcadero\Studio\Projects\frmNotePad_p.dproj"/>
+    </Target>
+    <Target Name="frmNotePad_p:Clean">
+        <MSBuild Projects="..\..\Embarcadero\Studio\Projects\frmNotePad_p.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="frmNotePad_p:Make">
+        <MSBuild Projects="..\..\Embarcadero\Studio\Projects\frmNotePad_p.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="frmBallGame_p;frmWebBrowser_p;frmNotePad_p"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="frmBallGame_p:Clean;frmWebBrowser_p:Clean;frmNotePad_p:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="frmBallGame_p:Make;frmWebBrowser_p:Make;frmNotePad_p:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
