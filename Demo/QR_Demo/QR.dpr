@@ -12,7 +12,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  TStyleManager.TrySetStyle('Sapphire Kamri');
+  TStyleManager.TrySetStyle('Metropolis UI Blue');
   Application.CreateForm(TfrmQRGen, frmQRGen);
   Application.Run;
 end.
