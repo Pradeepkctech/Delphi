@@ -4,8 +4,8 @@ object frmQRGen: TfrmQRGen
   Top = 0
   Anchors = []
   Caption = 'KC Tech'#39's QR Generator'
-  ClientHeight = 617
-  ClientWidth = 891
+  ClientHeight = 584
+  ClientWidth = 819
   Color = clBtnFace
   Constraints.MinHeight = 320
   Constraints.MinWidth = 550
@@ -14,56 +14,38 @@ object frmQRGen: TfrmQRGen
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Padding.Left = 3
-  Padding.Top = 3
-  Padding.Right = 3
-  Padding.Bottom = 3
   OldCreateOrder = False
   Position = poDesktopCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    891
-    617)
+    819
+    584)
   PixelsPerInch = 96
   TextHeight = 13
   object pnlMaster: TPanel
     AlignWithMargins = True
-    Left = 24
-    Top = 24
-    Width = 841
+    Left = 8
+    Top = 8
+    Width = 801
     Height = 569
-    Margins.Right = 0
     Anchors = [akLeft, akTop, akRight, akBottom]
     UseDockManager = False
-    Padding.Left = 10
-    Padding.Top = 10
-    Padding.Right = 10
-    Padding.Bottom = 10
+    Padding.Left = 5
+    Padding.Top = 5
+    Padding.Right = 5
+    Padding.Bottom = 5
     TabOrder = 0
     DesignSize = (
-      841
+      801
       569)
-    object lblKCTech: TLabel
-      Left = 273
-      Top = 8
-      Width = 276
-      Height = 21
-      Caption = 'KC Techs'#39's QR Generator'
-      Font.Charset = ANSI_CHARSET
-      Font.Color = clMaroon
-      Font.Height = -19
-      Font.Name = 'Copperplate Gothic Bold'
-      Font.Style = [fsItalic]
-      ParentFont = False
-    end
     object pgcInput: TPageControl
       AlignWithMargins = True
       Left = 26
       Top = 78
       Width = 338
       Height = 239
-      ActivePage = tabText
+      ActivePage = tabSMS
       Font.Charset = ANSI_CHARSET
       Font.Color = clMaroon
       Font.Height = -13
@@ -147,95 +129,123 @@ object frmQRGen: TfrmQRGen
       object tabSMS: TTabSheet
         Caption = 'SMS'
         ImageIndex = 3
-        object edtSMS: TEdit
-          Left = 16
+        object lblPhone_No: TLabel
+          Left = 14
           Top = 24
+          Width = 69
+          Height = 18
+          Caption = 'Phone_No:'
+        end
+        object lblMSG: TLabel
+          Left = 16
+          Top = 83
+          Width = 33
+          Height = 18
+          Caption = 'SMS:'
+        end
+        object edtPhone: TEdit
+          Left = 16
+          Top = 48
           Width = 265
           Height = 26
           Color = clInfoBk
           TabOrder = 0
+          OnKeyPress = edtPhoneKeyPress
         end
         object btnGenerateSMS: TButton
-          Left = 104
-          Top = 67
+          Left = 120
+          Top = 163
           Width = 75
           Height = 25
           Caption = 'Generate'
           TabOrder = 1
+          OnClick = btnGenerateSMSClick
+        end
+        object edtSMS: TEdit
+          Left = 16
+          Top = 107
+          Width = 265
+          Height = 26
+          TabOrder = 2
         end
       end
     end
     object pnlPreview: TPanel
       AlignWithMargins = True
-      Left = 418
-      Top = 77
-      Width = 399
-      Height = 467
+      Left = 400
+      Top = 50
+      Width = 361
+      Height = 488
       Anchors = [akLeft, akTop, akRight, akBottom]
       Color = clWhite
       UseDockManager = False
       Font.Charset = ANSI_CHARSET
-      Font.Color = clMaroon
-      Font.Height = -13
+      Font.Color = clNavy
+      Font.Height = -19
       Font.Name = 'Palatino Linotype'
-      Font.Style = [fsBold]
+      Font.Style = [fsBold, fsUnderline]
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
       DesignSize = (
-        399
-        467)
+        361
+        488)
       object lblPreview: TLabel
-        Left = 163
-        Top = 8
-        Width = 61
-        Height = 22
+        Left = 137
+        Top = 9
+        Width = 73
+        Height = 26
         Anchors = []
         Caption = 'Preview'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clMaroon
-        Font.Height = -16
-        Font.Name = 'Palatino Linotype'
-        Font.Style = [fsBold]
-        ParentFont = False
-        ExplicitLeft = 133
       end
       object pnlQR: TPanel
-        Left = 0
-        Top = 128
-        Width = 401
-        Height = 345
+        AlignWithMargins = True
+        Left = -6
+        Top = 114
+        Width = 367
+        Height = 378
+        Margins.Left = 0
+        Margins.Top = 0
+        Margins.Right = 0
+        Margins.Bottom = 0
         Anchors = [akLeft, akTop, akRight, akBottom]
-        Color = clWhite
+        Color = clMedGray
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clNavy
+        Font.Height = -13
+        Font.Name = 'Palatino Linotype'
+        Font.Style = [fsBold]
         ParentBackground = False
+        ParentFont = False
         TabOrder = 0
         DesignSize = (
-          401
-          345)
+          367
+          378)
         object PaintBox1: TPaintBox
-          AlignWithMargins = True
-          Left = 32
-          Top = 22
-          Width = 337
-          Height = 266
+          Left = 40
+          Top = 36
+          Width = 294
+          Height = 297
           Margins.Left = 0
           Margins.Right = 0
           Margins.Bottom = 0
           Align = alCustom
+          Anchors = [akLeft, akTop, akRight, akBottom]
           Color = clInfoBk
           ParentColor = False
           OnPaint = PaintBox1Paint
-          ExplicitTop = 19
+          ExplicitWidth = 288
         end
         object btnSave: TButton
-          Left = 162
-          Top = 306
-          Width = 77
+          Left = 146
+          Top = 344
+          Width = 80
           Height = 28
           Anchors = []
-          Caption = 'Save'
+          Caption = 'Save QR'
           TabOrder = 0
           OnClick = btnSaveClick
+          ExplicitLeft = 143
         end
       end
     end
@@ -297,6 +307,37 @@ object frmQRGen: TfrmQRGen
           'ISO-8859-1'
           'UTF-8 without BOM'
           'UTF-8 with BOM')
+      end
+    end
+    object pnlTitle: TPanel
+      AlignWithMargins = True
+      Left = 6
+      Top = 6
+      Width = 789
+      Height = 41
+      Margins.Left = 0
+      Margins.Top = 0
+      Margins.Right = 0
+      Margins.Bottom = 0
+      Align = alTop
+      TabOrder = 3
+      ExplicitWidth = 795
+      DesignSize = (
+        789
+        41)
+      object lblKCTech: TLabel
+        Left = 256
+        Top = 4
+        Width = 228
+        Height = 26
+        Anchors = []
+        Caption = 'KC Techs'#39's QR Generator'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWhite
+        Font.Height = -19
+        Font.Name = 'Palatino Linotype'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
     end
   end

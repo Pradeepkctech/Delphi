@@ -32,13 +32,17 @@ type
     btnGenerateEmail: TButton;
     edtEmail: TEdit;
     tabSMS: TTabSheet;
-    edtSMS: TEdit;
+    edtPhone: TEdit;
     lblQuietZone: TLabel;
     btnGenerateSMS: TButton;
     SavePictureDialog1: TSavePictureDialog;
     lblKCTech: TLabel;
     pnlMaster: TPanel;
     pnlQR: TPanel;
+    edtSMS: TEdit;
+    lblPhone_No: TLabel;
+    lblMSG: TLabel;
+    pnlTitle: TPanel;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure PaintBox1Paint(Sender: TObject);
@@ -52,6 +56,8 @@ type
     procedure btnGenerateEmailClick(Sender: TObject);
     procedure edtContactKeyPress(Sender: TObject; var Key: Char);
     function IsValidEmail(const Value: string): boolean;
+    procedure btnGenerateSMSClick(Sender: TObject);
+    procedure edtPhoneKeyPress(Sender: TObject; var Key: Char);
         //  procedure FormShow(Sender: TObject);
 
 
@@ -141,6 +147,14 @@ begin
 
 end;
 
+procedure TfrmQRGen.edtPhoneKeyPress(Sender: TObject; var Key: Char);
+begin
+        if NOT(key in['0'..'9','+',#8])
+
+        then
+         key := #0;
+
+end;
 //To Generate OR for @Phone
 procedure TfrmQRGen.btnGeneratePhoneClick(Sender: TObject);
 var
@@ -173,7 +187,41 @@ begin
   PaintBox1.Repaint;
 
 end;
-     //To Generate OR for @Email
+     procedure TfrmQRGen.btnGenerateSMSClick(Sender: TObject);
+var
+  QRCode: TDelphiZXingQRCode;
+  Row, Column: Integer;
+begin
+  cmbEncoding.Enabled:=true;
+  QRCode := TDelphiZXingQRCode.Create;
+  try
+
+
+    QRCode.Data:= 'Phone.NO:'+edtPhone.Text + '  '+'Message:'+edtSMS.Text;
+    QRCode.Encoding := TQRCodeEncoding(cmbEncoding.ItemIndex);
+    QRCode.QuietZone := StrToIntDef(edtQuietZone.Text, 4);
+    QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
+    for Row := 0 to QRCode.Rows - 1 do
+    begin
+      for Column := 0 to QRCode.Columns - 1 do
+      begin
+        if (QRCode.IsBlack[Row, Column]) then
+        begin
+          QRCodeBitmap.Canvas.Pixels[Column, Row] := clBlack;
+        end
+        else
+        begin
+          QRCodeBitmap.Canvas.Pixels[Column, Row] := clWhite;
+        end;
+      end;
+    end;
+  finally
+  FreeAndNil(QRCode);
+  end;
+  PaintBox1.Repaint;
+end;
+
+//To Generate OR for @Email
 procedure TfrmQRGen.btnGenerateEmailClick(Sender: TObject);
 var
   QRCode: TDelphiZXingQRCode;
@@ -253,6 +301,9 @@ begin
   if SavePictureDialog1.Execute then
    QRCodeBitmap.SaveToFile(SavePictureDialog1.FileName);
 end;
+
+//For Changing Colours
+
 procedure TfrmQRGen.FormCreate(Sender: TObject);
 begin
   edtText.StyleElements := [seBorder];
@@ -272,8 +323,15 @@ begin
   edtEmail.StyleElements := [seBorder];
   edtSMS.StyleElements := [seBorder];
   pnlQR.Color:=$008CFF;
-  //btnSave.Color:=
+  lblPhone_No.StyleElements := [seBorder];
+  lblMSG.StyleElements := [seBorder];
+  lblPreview.Font.Color:= clHotLight;
+  lblEncoding.Font.Color:= clHotLight;
+  lblQuietZone.Font.Color:= clHotLight;
+  lblPhone_No.Font.Color:= clHotLight;
+  lblMSG.Font.Color:= clHotLight;
 
+ 
 
 
 
