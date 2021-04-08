@@ -1,5 +1,8 @@
 unit UQR;
 
+
+
+
 // Demo app for ZXing QRCode port to Delphi, by Debenu Pty Ltd (www.debenu.com)
 // Need a PDF SDK? Checkout Debenu Quick PDF Library: http://www.debenu.com/products/development/debenu-pdf-library/
 
@@ -46,27 +49,21 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure PaintBox1Paint(Sender: TObject);
-    procedure edtTextChange(Sender: TObject);
     procedure cmbEncodingChange(Sender: TObject);
     procedure edtQuietZoneChange(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
-
     procedure btnTextGenerateClick(Sender: TObject);
     procedure btnGeneratePhoneClick(Sender: TObject);
     procedure btnGenerateEmailClick(Sender: TObject);
-    procedure edtContactKeyPress(Sender: TObject; var Key: Char);
     function IsValidEmail(const Value: string): boolean;
     procedure btnGenerateSMSClick(Sender: TObject);
-    procedure edtPhoneKeyPress(Sender: TObject; var Key: Char);
-        //  procedure FormShow(Sender: TObject);
-
-
-
+    function QRGen(inputData: String): String;
+    procedure edtContactKeyPress(Sender: TObject; var Key: Char);
+    function keyPress(var data: Char): Char;
 
   private
     QRCodeBitmap: TBitmap;
   public
-   // procedure Update;
   end;
 
 var
@@ -75,48 +72,90 @@ var
 implementation
 
 {$R *.dfm}
- //For Validating Email Address
-function TfrmQRGEN.IsValidEmail(const Value: string): boolean;
+
+// For Validating Email Address
+function TfrmQRGen.IsValidEmail(const Value: string): boolean;
   function CheckAllowed(const s: string): boolean;
   var
     i: integer;
   begin
-    Result:= False;
-    for i:= 1 to Length(s) do
+    Result := False;
+    for i := 1 to Length(s) do
     begin
       // illegal char - no valid address
-      if not (s[i] in ['a'..'z','A'..'Z','0'..'9','_','-','.','+']) then
+      if not(s[i] in ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-', '.', '+'])
+      then
         Exit;
     end;
-    Result:= True;
+    Result := True;
   end;
+
 var
   i: integer;
   namePart, serverPart: string;
 begin
-  Result:= False;
+  Result := False;
 
-  i:= Pos('@', Value);
+  i := Pos('@', Value);
   if (i = 0) then
     Exit;
 
-  if(pos('..', Value) > 0) or (pos('@@', Value) > 0) or (pos('.@', Value) > 0)then
+  if (Pos('..', Value) > 0) or (Pos('@@', Value) > 0) or (Pos('.@', Value) > 0)
+  then
     Exit;
 
-  if(pos('.', Value) = 1) or (pos('@', Value) = 1) then
+  if (Pos('.', Value) = 1) or (Pos('@', Value) = 1) then
     Exit;
 
-  namePart:= Copy(Value, 1, i - 1);
-  serverPart:= Copy(Value, i + 1, Length(Value));
-  if (Length(namePart) = 0)  or (Length(serverPart) < 5)    then
-    Exit;                      // too short
+  namePart := Copy(Value, 1, i - 1);
+  serverPart := Copy(Value, i + 1, Length(Value));
+  if (Length(namePart) = 0) or (Length(serverPart) < 5) then
+    Exit; // too short
 
-  i:= Pos('.', serverPart);
+  i := Pos('.', serverPart);
   // must have dot and at least 3 places from end
-  if (i=0) or (i>(Length(serverPart)-2)) then
+  if (i = 0) or (i > (Length(serverPart) - 2)) then
     Exit;
 
-  Result:= CheckAllowed(namePart) and CheckAllowed(serverPart);
+  Result := CheckAllowed(namePart) and CheckAllowed(serverPart);
+end;
+ // For Block Typing the alphabetes in a Phone tab
+function TfrmQRGen.keyPress(var data: Char): Char;
+begin
+  if NOT(data in ['0' .. '9', '+', #8]) then
+    data := #0;
+end;
+ // For Creating QR
+function TfrmQRGen.QRGen(inputData: String): String;
+var
+  QRCode: TDelphiZXingQRCode;
+  Row, Column: integer;
+begin
+  cmbEncoding.Enabled := True;
+  QRCode := TDelphiZXingQRCode.Create;
+  try
+    QRCode.data := inputData;
+    QRCode.Encoding := TQRCodeEncoding(cmbEncoding.ItemIndex);
+    QRCode.QuietZone := StrToIntDef(edtQuietZone.Text, 4);
+    QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
+    for Row := 0 to QRCode.Rows - 1 do
+    begin
+      for Column := 0 to QRCode.Columns - 1 do
+      begin
+        if (QRCode.IsBlack[Row, Column]) then
+        begin
+          QRCodeBitmap.Canvas.Pixels[Column, Row] := clBlack;
+        end
+        else
+        begin
+          QRCodeBitmap.Canvas.Pixels[Column, Row] := clWhite;
+        end;
+      end;
+    end;
+  finally
+    FreeAndNil(QRCode);
+  end;
+  PaintBox1.Repaint;
 end;
 
 procedure TfrmQRGen.cmbEncodingChange(Sender: TObject);
@@ -124,185 +163,63 @@ begin
   Update;
 end;
 
-
-
 procedure TfrmQRGen.edtQuietZoneChange(Sender: TObject);
 begin
   Update;
 end;
 
-procedure TfrmQRGen.edtTextChange(Sender: TObject);
-begin
-  Update;
-end;
-
-   // For Block Typing alphabetes in a Phone tab
-
 procedure TfrmQRGen.edtContactKeyPress(Sender: TObject; var Key: Char);
 begin
-        if NOT(key in['0'..'9','+',#8])
-
-        then
-         key := #0;
-
+    keyPress(Key);
 end;
-
-procedure TfrmQRGen.edtPhoneKeyPress(Sender: TObject; var Key: Char);
-begin
-        if NOT(key in['0'..'9','+',#8])
-
-        then
-         key := #0;
-
-end;
-//To Generate OR for @Phone
+// To Generate OR for Phone
 procedure TfrmQRGen.btnGeneratePhoneClick(Sender: TObject);
 var
-  QRCode: TDelphiZXingQRCode;
-  Row, Column: Integer;
+  phone_no: String;
 begin
-  QRCode := TDelphiZXingQRCode.Create;
-  try
-    QRCode.Data := edtContact.Text;
-    QRCode.Encoding := TQRCodeEncoding(cmbEncoding.ItemIndex);
-    QRCode.QuietZone := StrToIntDef(edtQuietZone.Text, 4);
-    QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
-    for Row := 0 to QRCode.Rows - 1 do
-    begin
-      for Column := 0 to QRCode.Columns - 1 do
-      begin
-        if (QRCode.IsBlack[Row, Column]) then
-        begin
-          QRCodeBitmap.Canvas.Pixels[Column, Row] := clBlack;
-        end
-        else
-        begin
-          QRCodeBitmap.Canvas.Pixels[Column, Row] := clWhite;
-        end;
-      end;
-    end;
-  finally
-   FreeAndNil(QRCode);
-  end;
-  PaintBox1.Repaint;
-
+  phone_no := edtContact.Text;
+  QRGen(phone_no);
 end;
-     procedure TfrmQRGen.btnGenerateSMSClick(Sender: TObject);
+     //SMS
+procedure TfrmQRGen.btnGenerateSMSClick(Sender: TObject);
 var
-  QRCode: TDelphiZXingQRCode;
-  Row, Column: Integer;
+  smsData: String;
 begin
-  cmbEncoding.Enabled:=true;
-  QRCode := TDelphiZXingQRCode.Create;
-  try
-
-
-    QRCode.Data:= 'Phone.NO:'+edtPhone.Text + '  '+'Message:'+edtSMS.Text;
-    QRCode.Encoding := TQRCodeEncoding(cmbEncoding.ItemIndex);
-    QRCode.QuietZone := StrToIntDef(edtQuietZone.Text, 4);
-    QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
-    for Row := 0 to QRCode.Rows - 1 do
-    begin
-      for Column := 0 to QRCode.Columns - 1 do
-      begin
-        if (QRCode.IsBlack[Row, Column]) then
-        begin
-          QRCodeBitmap.Canvas.Pixels[Column, Row] := clBlack;
-        end
-        else
-        begin
-          QRCodeBitmap.Canvas.Pixels[Column, Row] := clWhite;
-        end;
-      end;
-    end;
-  finally
-  FreeAndNil(QRCode);
-  end;
-  PaintBox1.Repaint;
+  smsData := 'Phone.NO:' + edtPhone.Text + '  ' + 'Message:' + edtSMS.Text;
+  QRGen(smsData);
 end;
 
-//To Generate OR for @Email
+    //Email
 procedure TfrmQRGen.btnGenerateEmailClick(Sender: TObject);
 var
-  QRCode: TDelphiZXingQRCode;
-  Row, Column: Integer;
-  begin
+  emailData: String;
+begin
   if IsValidEmail(edtEmail.Text) then
   begin
-
-  cmbEncoding.Enabled:=true;
-  QRCode := TDelphiZXingQRCode.Create;
-
-
-  try
-    QRCode.Data := edtEmail.Text;
-    QRCode.Encoding := TQRCodeEncoding(cmbEncoding.ItemIndex);
-    QRCode.QuietZone := StrToIntDef(edtQuietZone.Text, 4);
-    QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
-    for Row := 0 to QRCode.Rows - 1 do
-    begin
-      for Column := 0 to QRCode.Columns - 1 do
-      begin
-        if (QRCode.IsBlack[Row, Column]) then
-        begin
-          QRCodeBitmap.Canvas.Pixels[Column, Row] := clBlack;
-        end
-        else
-        begin
-          QRCodeBitmap.Canvas.Pixels[Column, Row] := clWhite;
-        end;
-      end;
-    end;
-  finally
-   FreeAndNil(QRCode);
-  end;
-  PaintBox1.Repaint;
-end
-    else
+    emailData := edtEmail.Text;
+    QRGen(emailData);
+  end
+  else
     ShowMessage('InValid Email Address');
 end;
-   //To Generate OR for @Text
+
+//Text
 procedure TfrmQRGen.btnTextGenerateClick(Sender: TObject);
 var
-  QRCode: TDelphiZXingQRCode;
-  Row, Column: Integer;
+  Qr: String;
 begin
-  cmbEncoding.Enabled:=true;
-  QRCode := TDelphiZXingQRCode.Create;
-  try
-
-
-    QRCode.Data := edtText.Text ;
-    QRCode.Encoding := TQRCodeEncoding(cmbEncoding.ItemIndex);
-    QRCode.QuietZone := StrToIntDef(edtQuietZone.Text, 4);
-    QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
-    for Row := 0 to QRCode.Rows - 1 do
-    begin
-      for Column := 0 to QRCode.Columns - 1 do
-      begin
-        if (QRCode.IsBlack[Row, Column]) then
-        begin
-          QRCodeBitmap.Canvas.Pixels[Column, Row] := clBlack;
-        end
-        else
-        begin
-          QRCodeBitmap.Canvas.Pixels[Column, Row] := clWhite;
-        end;
-      end;
-    end;
-  finally
-  FreeAndNil(QRCode);
-  end;
-  PaintBox1.Repaint;
+  Qr := edtText.Text;
+  QRGen(Qr)
 end;
-  //To Save QR as Image
+
+// To Save QR as Image
 procedure TfrmQRGen.btnSaveClick(Sender: TObject);
 begin
   if SavePictureDialog1.Execute then
-   QRCodeBitmap.SaveToFile(SavePictureDialog1.FileName);
+    QRCodeBitmap.SaveToFile(SavePictureDialog1.FileName);
 end;
 
-//For Changing Colours
+// For Changing Colours
 
 procedure TfrmQRGen.FormCreate(Sender: TObject);
 begin
@@ -322,27 +239,28 @@ begin
   edtContact.StyleElements := [seBorder];
   edtEmail.StyleElements := [seBorder];
   edtSMS.StyleElements := [seBorder];
-  pnlQR.Color:=$008CFF;
+  pnlQR.Color := $008CFF;
   lblPhone_No.StyleElements := [seBorder];
+  edtText.Font.Color := clHotLight;
+  cmbEncoding.Font.Color := clHotLight;
+  edtQuietZone.Font.Color := clHotLight;
   lblMSG.StyleElements := [seBorder];
-  lblPreview.Font.Color:= clHotLight;
-  lblEncoding.Font.Color:= clHotLight;
-  lblQuietZone.Font.Color:= clHotLight;
-  lblPhone_No.Font.Color:= clHotLight;
-  lblMSG.Font.Color:= clHotLight;
-
- 
-
-
+  lblPreview.Font.Color := clHotLight;
+  lblEncoding.Font.Color := clHotLight;
+  lblQuietZone.Font.Color := clHotLight;
+  lblPhone_No.Font.Color := clHotLight;
+  lblMSG.Font.Color := clHotLight;
+  edtSMS.StyleElements := [seBorder];
 
   Update;
 end;
 
 procedure TfrmQRGen.FormDestroy(Sender: TObject);
 begin
- FreeAndNil(QRCodeBitmap);
+  FreeAndNil(QRCodeBitmap);
 end;
 
+// for paint the QR
 procedure TfrmQRGen.PaintBox1Paint(Sender: TObject);
 var
   Scale: Double;
@@ -363,18 +281,6 @@ begin
       Trunc(Scale * QRCodeBitmap.Height)), QRCodeBitmap);
   end;
 end;
-     end.
 
-
-
-
-
-
-
-
-
-
-
-
-
+end.
 

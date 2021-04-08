@@ -3,9 +3,11 @@ unit UREST;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs,REST.JSON,System.JSON, Vcl.StdCtrls,
-  clHttpRequest, clTcpClient, clTcpClientTls, clHttp, Vcl.ExtCtrls;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, REST.JSON, System.JSON, Vcl.StdCtrls,
+  clHttpRequest, clTcpClient, clTcpClientTls, clHttp, Vcl.ExtCtrls, Vcl.ComCtrls,
+  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP;
 
 type
   TfrmREST = class(TForm)
@@ -19,13 +21,18 @@ type
     btnGet: TButton;
     pnlAuthenticate: TPanel;
     pnlDropDown: TPanel;
-    mmoShow: TMemo;
+    lblCountry: TLabel;
+    lblState: TLabel;
+    lblCity: TLabel;
+    lblTitle: TLabel;
+    lblToken: TLabel;
     procedure FormShow(Sender: TObject);
     procedure btnGetClick(Sender: TObject);
     procedure cmbStateChange(Sender: TObject);
     procedure cmbCountrySelect(Sender: TObject);
     procedure cmbStateSelect(Sender: TObject);
-  private
+    procedure cmbCityClick(Sender: TObject);
+   private
     { Private declarations }
   public
     { Public declarations }
@@ -41,24 +48,18 @@ implementation
 procedure TfrmREST.btnGetClick(Sender: TObject);
 var
   LITEM, lJsonValue: TJSONValue;
-  lJsonData: string;
-  request: string;
-  seceret: string;
-  JSON: string;
-  tmpJson: TJsonObject;
-token:WideString;
-country:TStringStream;
+  token: WideString;
+  country: TStringStream;
 begin
-token:='Bearer '+mmoToken.Text;
-//ShowMessage(token);
-httpReq.Header.Accept:='application/json';
-httpReq.Header.Authorization:=token;
-country:=TStringStream.Create();
-http.SendRequest('GET','https://www.universal-tutorial.com/api/countries/',httpReq,country);
-//ShowMessage(country.DataString);
-lJsonValue := TJsonObject.ParseJSONValue(country.DataString);
-  // lJsonData contains the above mentioned JSON data
-  if lJsonValue <> nil then
+ShowMessage(mmoToken.Lines.Text.Length.ToString);
+  token := 'Bearer ' + mmoToken.Text;
+  httpReq.Header.Accept := 'application/json';
+  httpReq.Header.Authorization := token;
+  country := TStringStream.Create();
+  http.SendRequest('GET', 'https://www.universal-tutorial.com/api/countries/',
+  httpReq, country);
+  lJsonValue := TJsonObject.ParseJSONValue(country.DataString);
+    if lJsonValue <> nil then
     try
       begin
         for LITEM in lJsonValue as TJSONArray do
@@ -72,28 +73,29 @@ lJsonValue := TJsonObject.ParseJSONValue(country.DataString);
     end;
 end;
 
-procedure TfrmREST.cmbCountrySelect(Sender: TObject);
-var cntryName:String;
-LITEM, lJsonValue: TJSONValue;
-  lJsonData: string;
-  request: string;
-  seceret: string;
-  JSON: string;
-  c_response:TStringStream;
-  tmpJson: TJsonObject;
-  token:WideString;
+
+procedure TfrmREST.cmbCityClick(Sender: TObject);
 begin
-        cntryName:=cmbCountry.Text;
-        token:='Bearer '+mmoToken.Text;
-//ShowMessage(token);
-httpReq.Header.Accept:='application/json';
-httpReq.Header.Authorization:=token;
-c_response:=TStringStream.Create();
-http.SendRequest('GET','https://www.universal-tutorial.com/api/states/'+cntryName,httpReq,c_response);
-//ShowMessage(c_response.DataString);
-lJsonValue := TJsonObject.ParseJSONValue(c_response.DataString);
-  // lJsonData contains the above mentioned JSON data
-  if lJsonValue <> nil then
+lblCity.Caption:='City : '+cmbCity.Text;
+end;
+
+procedure TfrmREST.cmbCountrySelect(Sender: TObject);
+var
+  cntryName: String;
+  LITEM, lJsonValue: TJSONValue;
+  c_response: TStringStream;
+  token: WideString;
+begin
+  cntryName := cmbCountry.Text;
+  lblCountry.Caption:='Country : '+cntryName;
+  token := 'Bearer ' + mmoToken.Text;
+   httpReq.Header.Accept := 'application/json';
+  httpReq.Header.Authorization := token;
+  c_response := TStringStream.Create();
+  http.SendRequest('GET', 'https://www.universal-tutorial.com/api/states/' +
+  cntryName, httpReq, c_response);
+  lJsonValue := TJsonObject.ParseJSONValue(c_response.DataString);
+   if lJsonValue <> nil then
     try
       begin
         for LITEM in lJsonValue as TJSONArray do
@@ -106,37 +108,30 @@ lJsonValue := TJsonObject.ParseJSONValue(c_response.DataString);
       lJsonValue.Free;
     end;
 
-
-
 end;
 
 procedure TfrmREST.cmbStateChange(Sender: TObject);
 begin
-Update;
+  Update;
 end;
 
 procedure TfrmREST.cmbStateSelect(Sender: TObject);
-var stName:String;
-LITEM, lJsonValue: TJSONValue;
-  lJsonData: string;
-  request: string;
-  seceret: string;
-  JSON: string;
-  s_response:TStringStream;
-  tmpJson: TJsonObject;
-  token:WideString;
+var
+  stName: String;
+  LITEM, lJsonValue: TJSONValue;
+  s_response: TStringStream;
+  token: WideString;
 begin
-        stName:=cmbState.Text;
-        token:='Bearer '+mmoToken.Text;
-//ShowMessage(token);
-httpReq.Header.Accept:='application/json';
-httpReq.Header.Authorization:=token;
-s_response:=TStringStream.Create();
-http.SendRequest('GET','https://www.universal-tutorial.com/api/cities/'+stName,httpReq,s_response);
-//ShowMessage(c_response.DataString);
-lJsonValue := TJsonObject.ParseJSONValue(s_response.DataString);
-  // lJsonData contains the above mentioned JSON data
-  if lJsonValue <> nil then
+  stName := cmbState.Text;
+  lblState.Caption:='State : '+stName;
+  token := 'Bearer ' + mmoToken.Text;
+  httpReq.Header.Accept := 'application/json';
+  httpReq.Header.Authorization := token;
+  s_response := TStringStream.Create();
+  http.SendRequest('GET', 'https://www.universal-tutorial.com/api/cities/' +
+  stName, httpReq, s_response);
+  lJsonValue := TJsonObject.ParseJSONValue(s_response.DataString);
+    if lJsonValue <> nil then
     try
       begin
         for LITEM in lJsonValue as TJSONArray do
@@ -149,17 +144,23 @@ lJsonValue := TJsonObject.ParseJSONValue(s_response.DataString);
       lJsonValue.Free;
     end;
 end;
-
-procedure TfrmREST.FormShow(Sender: TObject);
+ procedure TfrmREST.FormShow(Sender: TObject);
 var
-token_responce:TStringStream;
+  token_responce: TStringStream;
+
 begin
-httpReq.Header.Accept:='application/json';
-httpReq.Header.Authorization:='jz1dYuraUVWBAnyO5F-0Pp0kLhjRcKfDnYkByhvKBBVjR21qRA_aOL3BPqU9u05RoSg';
-httpReq.HeaderSource.AddPair('user-email','test12kct@gmail.com');
-token_responce:=TStringStream.Create();
-http.SendRequest('GET','https://www.universal-tutorial.com/api/getaccesstoken',httpReq,token_responce);
-mmoToken.Lines.Text:=token_responce.DataString;
-mmoShow.Lines.Text:='{ Country:'+cmbCountry.Text+','+'State: '+cmbState.Text+','+'City: '+cmbCity.Text+'}';
+  httpReq.Header.Accept := 'application/json';
+
+  httpReq.HeaderSource.AddPair('api-token','z1dYuraUVWBAnyO5F-0Pp0kLhjRcKfDnYkByhvKBBVjR21qRA_aOL3BPqU9u05RoSg');
+  httpReq.HeaderSource.AddPair('user-email','test12kct@gmail.com');
+  token_responce := TStringStream.Create();
+  http.SendRequest('GET','https://www.universal-tutorial.com/api/getaccesstoken', httpReq,token_responce);
+
+
+
+
+
+  mmoToken.Lines.Text:=token_responce.DataString;
 end;
+
 end.

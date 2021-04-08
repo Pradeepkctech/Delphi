@@ -150,7 +150,7 @@ object frmQRGen: TfrmQRGen
           Height = 26
           Color = clInfoBk
           TabOrder = 0
-          OnKeyPress = edtPhoneKeyPress
+          OnKeyPress = edtContactKeyPress
         end
         object btnGenerateSMS: TButton
           Left = 120
@@ -166,6 +166,7 @@ object frmQRGen: TfrmQRGen
           Top = 107
           Width = 265
           Height = 26
+          Color = clInfoBk
           TabOrder = 2
         end
       end
@@ -173,9 +174,9 @@ object frmQRGen: TfrmQRGen
     object pnlPreview: TPanel
       AlignWithMargins = True
       Left = 400
-      Top = 50
+      Top = 78
       Width = 361
-      Height = 488
+      Height = 466
       Anchors = [akLeft, akTop, akRight, akBottom]
       Color = clWhite
       UseDockManager = False
@@ -189,21 +190,22 @@ object frmQRGen: TfrmQRGen
       TabOrder = 1
       DesignSize = (
         361
-        488)
+        466)
       object lblPreview: TLabel
         Left = 137
-        Top = 9
+        Top = 8
         Width = 73
         Height = 26
         Anchors = []
         Caption = 'Preview'
+        ExplicitTop = 9
       end
       object pnlQR: TPanel
         AlignWithMargins = True
         Left = -6
         Top = 114
         Width = 367
-        Height = 378
+        Height = 356
         Margins.Left = 0
         Margins.Top = 0
         Margins.Right = 0
@@ -220,12 +222,12 @@ object frmQRGen: TfrmQRGen
         TabOrder = 0
         DesignSize = (
           367
-          378)
+          356)
         object PaintBox1: TPaintBox
           Left = 40
-          Top = 36
+          Top = 20
           Width = 294
-          Height = 297
+          Height = 275
           Margins.Left = 0
           Margins.Right = 0
           Margins.Bottom = 0
@@ -234,18 +236,16 @@ object frmQRGen: TfrmQRGen
           Color = clInfoBk
           ParentColor = False
           OnPaint = PaintBox1Paint
-          ExplicitWidth = 288
         end
         object btnSave: TButton
           Left = 146
-          Top = 344
+          Top = 323
           Width = 80
           Height = 28
           Anchors = []
           Caption = 'Save QR'
           TabOrder = 0
           OnClick = btnSaveClick
-          ExplicitLeft = 143
         end
       end
     end
@@ -321,7 +321,6 @@ object frmQRGen: TfrmQRGen
       Margins.Bottom = 0
       Align = alTop
       TabOrder = 3
-      ExplicitWidth = 795
       DesignSize = (
         789
         41)
